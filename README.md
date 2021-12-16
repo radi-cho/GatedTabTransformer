@@ -18,7 +18,7 @@ model = TabTransformer(
     ff_dropout = config["dropout"],                     # feed forward dropout
     mlp_act = nn.LeakyReLU(config["relu_slope"]),       # activation for final mlp, defaults to relu, but could be anything else (selu, etc.)
     mlp_depth=config["mlp_depth"],                      # mlp hidden layers depth
-    mlp_dimension=config["mlp_dimension"],              # dimension of gmlp layers, if enabled
+    mlp_dimension=config["mlp_dimension"],              # dimension of mlp layers
     gmlp_enabled=config["gmlp_enabled"]                 # gmlp or standard mlp
 )
 ```
