@@ -39,12 +39,12 @@ def train_experiment(config):
         dim_out = 1,                                        # binary prediction, but could be anything
         transformer_depth = config["transformer_depth"],    # depth, paper recommended 6
         transformer_heads = config["transformer_heads"],    # heads, paper recommends 8
-        attn_dropout = 0.1,                                 # post-attention dropout
-        ff_dropout = 0.1,                                   # feed forward dropout
+        attn_dropout = config["dropout"],                   # post-attention dropout
+        ff_dropout = config["dropout"],                     # feed forward dropout
         mlp_act = nn.LeakyReLU(config["relu_slope"]),       # activation for final mlp, defaults to relu, but could be anything else (selu etc)
         mlp_depth=config["mlp_depth"],                      # mlp hidden layers depth
-        gmlp_enabled=config["gmlp"],                        # gmlp or standard mlp
-        gmlp_dim=config["gmlp_dim"]                         # dimension of gmlp layers, if enabled
+        mlp_dimension=config["mlp_dimension"]               # dimension of gmlp layers, if enabled
+        gmlp_enabled=config["gmlp_enabled"],                # gmlp or standard mlp
     )
 
     model = model.train().to(device=device)
@@ -75,43 +75,33 @@ def train_experiment(config):
     model.load_state_dict(trained_model_dict)
     score = validate(model, test_cont, test_categ, test_target, device=device, save_metrics=True)
 
-    # tune.report(auc=score)
+    tune.report(auc=score)
     print("Final score", score)
 
-    
-# ray.init(address='auto', _redis_password='5241590000000000')
 
-train_experiment({
-    "gmlp": True,
-    "gmlp_dim": 16,
-    "batch_size": 256,
-    "patience": 5,
-    "initial_lr": 1e-3,
-    "transformer_depth": 6,
-    "transformer_dim": 32,
-    "transformer_heads": 8,
-    "scheduler_step": 3,
-    "scheduler_gamma": 0.2,
-    "relu_slope": 0
-})
+# HPO training example summarizing all the aspects of the paper
+if __name__ == "__main__":
+    ray.init(address='auto')
 
-# analysis = tune.run(
-#     train_experiment,
-#     num_samples=15,
-#     log_to_file=True,
-#     resources_per_trial={"gpu": 1},
-#     config={
-#         "batch_size": tune.choice([128, 256]),
-#         "patience": tune.choice([2, 5, 10, 15]),
-#         "initial_lr": tune.grid_search([5e-2, 1e-2, 5e-3, 1e-3, 5e-4]),
-#         "scheduler_gamma": tune.grid_search([0.5, 0.2, 0.1]),
-#         "scheduler_step": tune.grid_search([5, 10, 15]),
-#         "relu_slope": tune.grid_search([0.01, 0.02, 0.05, 0.1, 0.2]),
-#         "transformer_heads": tune.grid_search([4, 8, 12, 16]),
-#         "transformer_depth": tune.grid_search([4, 6, 8]),
-#         "transformer_dim": tune.grid_search([8, 16, 32, 64, 128]),
-#         "gmlp": tune.grid_search([(False, 0), (True, 32), (True, 64)])
-#         # TODO: Clean up the gMLP configuration.
-#     })
+    analysis = tune.run(
+        train_experiment,
+        num_samples=15,
+        log_to_file=True,
+        resources_per_trial={"gpu": 1},
+        config={
+            "batch_size": tune.choice([128, 256]),
+            "patience": tune.choice([2, 5, 10, 15]),
+            "initial_lr": tune.grid_search([5e-2, 1e-2, 5e-3, 1e-3, 5e-4]),
+            "scheduler_gamma": tune.grid_search([0.5, 0.2, 0.1]),
+            "scheduler_step": tune.grid_search([5, 10, 15]),
+            "relu_slope": tune.grid_search([0.01, 0.02, 0.05, 0.1, 0.2]),
+            "transformer_heads": tune.grid_search([4, 8, 12, 16]),
+            "transformer_depth": tune.grid_search([4, 6, 8]),
+            "transformer_dim": tune.grid_search([8, 16, 32, 64, 128]),
+            "gmlp_enabled": tune.grid_search([False, True]),
+            "mlp_depth": tune.grid_search([2, 4, 6, 8]),
+            "mlp_dimension": tune.grid_search([8, 16, 32, 64, 128, 256]),
+            "dropout": tune.grid.search([0.0, 0.1, 0.2, 0.5])
+        })
 
-# print("Best config: ", analysis.get_best_config(metric="auc", mode="max"))
+    print("Best config: ", analysis.get_best_config(metric="auc", mode="max"))

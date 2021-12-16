@@ -139,7 +139,7 @@ class TabTransformer(nn.Module):
         transformer_dim,
         transformer_depth,
         transformer_heads,
-        dim_head = 16,
+        transformer_dim_head = 16,
         dim_out = 1,
         mlp_depth = 2,
         mlp_act = None,
@@ -148,7 +148,7 @@ class TabTransformer(nn.Module):
         attn_dropout = 0.,
         ff_dropout = 0.,
         gmlp_enabled=False,
-        gmlp_dim=32,
+        mlp_dimension=32,
     ):
         super().__init__()
         assert all(map(lambda n: n > 0, categories)), 'number of each category must be positive'
@@ -185,22 +185,21 @@ class TabTransformer(nn.Module):
             dim = transformer_dim,
             depth = transformer_depth,
             heads = transformer_heads,
-            dim_head = dim_head,
+            dim_head = transformer_dim_head,
             attn_dropout = attn_dropout,
             ff_dropout = ff_dropout
         )
 
-        # gmlp to logits
+        # mlp to logits
 
         input_size = (transformer_dim * self.num_categories) + num_continuous
-
 
         if gmlp_enabled:
             self.mlp = gMLPClassification(
                 patch_width=1,
                 seq_len=input_size,
                 num_classes = 1,
-                dim = gmlp_dim,
+                dim = mlp_dimension,
                 depth = mlp_depth
             )
         else:
