@@ -2,7 +2,7 @@
 
 A deep learning tabular classification architecture inspired by [TabTransformer](https://arxiv.org/abs/2012.06678) with integrated [gated](https://arxiv.org/abs/2105.08050) multilayer perceptron.
 
-![Architecture design](./paper/media/Gated_TabTransformer.png)
+<img alt="Architecture" src="./paper/media/Gated_TabTransformer.png" width="250px"></img>
 
 ## Usage
 
