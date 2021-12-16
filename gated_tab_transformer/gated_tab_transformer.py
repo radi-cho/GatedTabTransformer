@@ -203,11 +203,14 @@ class TabTransformer(nn.Module):
                 depth = mlp_depth
             )
         else:
-            mlp_hidden_mults = []
-            for i in range(mlp_depth):
-                mlp_hidden_mults.append(2**(mlp_depth - i))
+            hidden_dimensions = []
 
-            hidden_dimensions = list(map(lambda t: (input_size // 8) * t, mlp_hidden_mults))
+            for i in range(mlp_depth):
+                if mlp_dimension == -1:
+                    hidden_dimensions.append((input_size // 8) * (2**(mlp_depth - i)))
+                else:
+                    hidden_dimensions.append(mlp_dimension)
+            
             all_dimensions = [input_size, *hidden_dimensions, dim_out]
             self.mlp = MLP(all_dimensions, act = mlp_act)
 
