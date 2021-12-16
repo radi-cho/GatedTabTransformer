@@ -6,7 +6,7 @@ import pandas as pd
 import ray
 from ray import tune
 
-from tab_transformer_pytorch import TabTransformer
+from gated_tab_transformer import TabTransformer
 from train_with_validation import train, validate
 from data_utils import get_unique_categorical_counts, get_categ_cont_target_values, train_val_test_split
 from metadata import datasets
