@@ -1,4 +1,4 @@
-# The gated TabTransformer.
+# The GatedTabTransformer.
 
 A deep learning tabular classification architecture inspired by [TabTransformer](https://arxiv.org/abs/2012.06678) with integrated [gated](https://arxiv.org/abs/2105.08050) multilayer perceptron.
 
@@ -28,7 +28,7 @@ model = TabTransformer(
 ```
 @software{gTabTransformer,
   author = {{Radostin Cholakov, Todor Kolev}},
-  title = {The gated TabTransformer.},
+  title = {The GatedTabTransformer.},
   url = {https://github.com/radi-cho/gTabTransformer},
   version = {0.0.1},
   date = {2021-12-15},
