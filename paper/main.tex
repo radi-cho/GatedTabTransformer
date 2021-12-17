@@ -12,7 +12,7 @@
 
 \newcommand{\projectSource}{\url{https://github.com/radi-cho/gTabTransformer}}
 
-\title[The gated TabTransformer]{The gated TabTransformer.\\
+\title[The GatedTabTransformer]{The GatedTabTransformer.\\
 An enhanced deep learning\\
 architecture for tabular modeling.}
 \author[R. Cholakov]{%
@@ -32,7 +32,7 @@ Sofia, Bulgaria\\%
 
 \maketitle
 \begin{abstract}
-    There is an increasing interest in the application of deep learning architectures to tabular data. One of the state-of-the-art solutions is TabTransformer which incorporates an attention mechanism to better track relationships between categorical features and then makes use of a standard MLP to output its final logits. In this paper we propose multiple modifications to the original TabTransformer performing better on binary classification tasks for three separate datasets with up to 1.5\% AUROC gains. Inspired by gated MLP, linear projections are implemented in the MLP block and multiple activation functions are tested. We also evaluate the importance of specific hyper parameters during training.
+    There is an increasing interest in the application of deep learning architectures to tabular data. One of the state-of-the-art solutions is TabTransformer which incorporates an attention mechanism to better track relationships between categorical features and then makes use of a standard MLP to output its final logits. In this paper we propose multiple modifications to the original TabTransformer performing better on binary classification tasks for three separate datasets with more than 1\% AUROC gains. Inspired by gated MLP, linear projections are implemented in the MLP block and multiple activation functions are tested. We also evaluate the importance of specific hyper parameters during training.
 
     \medskip
     Keywords: deep learning, Transformer, tabular data
@@ -49,7 +49,7 @@ In this paper we will present an enhanced version of the TabTransformer with inc
 \subsection{The TabTransformer}
 \label{sec:tabtransformer}
 
-The TabTransformer model, introduced in December 2020 by researchers at Amazon manages to outperform the other state-of-the-art deep learning methods for tabular data by at least 1.0\% on mean AUC. It consists of a column embedding layer, a stack of $N$ Transformer layers, and a multilayer perceptron (figure \ref{fig:model}). The inputted tabular features are split in two parts for the categorical and continuous values. For each categorical feature the so called \textit{column embedding} is performed (see \cite{Huang2020TabTransformerTD}). It generates parametric embeddings which are inputted to a stack of Transformer layers. Each Transformer layer \cite{vaswani2017attention} consists of a multi-head self-attention layer followed by a position-wise feed-forward layer.
+The TabTransformer model, introduced in December 2020 by researchers at Amazon manages to outperform the other state-of-the-art deep learning methods for tabular data by at least 1.0\% on mean AUROC. It consists of a column embedding layer, a stack of $N$ Transformer layers, and a multilayer perceptron (figure \ref{fig:model}). The inputted tabular features are split in two parts for the categorical and continuous values. For each categorical feature the so called \textit{column embedding} is performed (see \cite{Huang2020TabTransformerTD}). It generates parametric embeddings which are inputted to a stack of Transformer layers. Each Transformer layer \cite{vaswani2017attention} consists of a multi-head self-attention layer followed by a position-wise feed-forward layer.
 
 \begin{equation}
     Attention(Q, K, V) = softmax(\frac{QK^T}{\sqrt{d_k}})V
@@ -102,9 +102,9 @@ Another recently published paper \cite{kadra2021well} from June 2021, initially 
 
 \begin{figure}[hpt]
   \begin{center}
-      \includegraphics[width=10cm]{Gated_TabTransformer.pdf}
+      \includegraphics[width=10cm]{GatedTabTransformer-architecture.pdf}
   \end{center}
-  \caption{Architecture of the proposed gated TabTransformer. $N$ Transformer blocks can be stacked on one another. The same is true for $L$ gMLP layers.}
+  \caption{Architecture of the proposed GatedTabTransformer. $N$ Transformer blocks can be stacked on one another. The same is true for $L$ gMLP layers.}
   \label{fig:model}
 \end{figure}
 
@@ -120,13 +120,13 @@ Model implementation\footnote{Model implementation, experiments setup and datase
 
 \section{Experiments}
 
-To test the proposed architecture multiple experiments were conducted. Their main objective was to compare the standard TabTransformer's performance to the novel model.
+To test the proposed architecture multiple experiments were conducted. Their main objective was to compare the standard TabTransformer's performance to the proposed model.
 
 \subsection{Data}
 
-We made use of three main datasets for experimentation - namely \textit{blastchar} and \textit{1995\_income} from Kaggle\footnote{\url{https://kaggle.com/}} and \textit{bank\_marketing} from UCI repository\footnote{\url{http://archive.ics.uci.edu/ml/index.php}}. Their size varies between 7K and 45K samples with 14 to 19 features. In all datasets the label values are binary, thus binary classification should be performed. These three sets are all also mentioned in the original TabTransformer paper \cite{Huang2020TabTransformerTD}. Detailed data characteristics can be found in Appendix \ref{appendix:data}.
+We made use of three main datasets for experimentation - namely \textit{blastchar}, \textit{1995\_income} from Kaggle\footnote{\url{https://kaggle.com/}}, and \textit{bank\_marketing} from UCI repository\footnote{\url{http://archive.ics.uci.edu/ml/index.php}}. Their size varies between 7K and 45K samples with 14 to 19 features. In all datasets the label values are binary, thus binary classification should be performed. These three sets are all also mentioned in the original TabTransformer paper \cite{Huang2020TabTransformerTD}. Detailed data characteristics can be found in Appendix \ref{appendix:data}.
 
-Dataset splitting follows the 65/15/20\% pattern for train/validation/evaluation. The validation split is used to pick the best performing model state during training and the evaluation split is only used to determine the final scores.
+Dataset splitting follows the 65/15/20\% pattern for train/validation/test. The validation split is used to pick the best performing model state during training and the test split is only used to determine the final scores.
 
 During our research the \textit{pandas} \cite{mckinney-proc-scipy-2010} and \textit{seaborn} \cite{Waskom2021} packages were used for data analysis, manipulation and visualisation.
 
@@ -165,13 +165,13 @@ For both models LeakyReLU with slopes from 0.01 up to 0.05 and the standard ReLU
 
 \subsection{Performance evaluation metrics}
 
-For consistency with previously conducted studies we utilized area under receiver operating characteristic curve\footnote{\url{https://en.wikipedia.org/wiki/Receiver_operating_characteristic}} as a performance evaluation technique \cite{bradley1997use}. The reported results are generated by training and evaluating a model configuration with the same parameters but with different seeds or randomized order of data samples multiple times (usually 5, 25 or 50), computing the mean AUROC and then comparing it to the mean scores of the other model configurations. For the TabNet model comparison expected gains were manually calculated based on the results reported in \cite{Huang2020TabTransformerTD} and \cite{fiedler2021simple}.
+For consistency with previously conducted studies we utilized area under receiver operating characteristic curve (AUROC)\footnote{\url{https://en.wikipedia.org/wiki/Receiver_operating_characteristic}} as a performance evaluation technique \cite{bradley1997use}. The reported results are generated by training and evaluating a model configuration with the same parameters but with different seeds or randomized order of data samples multiple times (usually 5, 25 or 50), computing the mean AUROC and then comparing it to the mean scores of the other model configurations. For the TabNet model comparison expected gains were manually calculated based on the results reported in \cite{Huang2020TabTransformerTD} and \cite{fiedler2021simple}.
 
 To estimate and visualise the performance of our models we used the \textit{scikit-learn} \cite{scikit-learn} and \textit{matplotlib} \cite{Hunter:2007} packages for Python.
 
 \subsection{Performance comparisons}
 
-As a result of our proposals the gated TabTransformer shows between 0.5\% and 1.1\% performance increase in terms of mean AUROC (figure \ref{fig:auc-results}) compared to the baseline TabTransformer and 1\% to 2\% increase compared to MLPs (table \ref{tab:results-gain}).
+As a result of our proposals the GatedTabTransformer shows between 0.5\% and 1.1\% performance increase in terms of mean AUROC (figure \ref{fig:auc-results}) compared to the baseline TabTransformer and 1\% to 2\% increase compared to MLPs (table \ref{tab:results-gain}).
 
 \begin{table}[htp]
 \caption{
@@ -193,9 +193,9 @@ As a result of our proposals the gated TabTransformer shows between 0.5\% and 1.
 
 \begin{figure}[hpt]
   \begin{center}
-      \includegraphics[width=12.5cm]{roc_comparison.png}
+      \includegraphics[width=12.5cm]{roc-comparison.png}
   \end{center}
-  \caption{AUROC gain charts for the 3 datasets - comparison between baseline TabTransformer (\textcolor[rgb]{0.12,0.53,0.7}{blue}) and the proposed gated TabTransformer (\textcolor[rgb]{1,0.4,0}{orange}).}
+  \caption{AUROC gain charts for the 3 datasets - comparison between baseline TabTransformer (\textcolor[rgb]{0.12,0.53,0.7}{blue}) and the proposed GatedTabTransformer (\textcolor[rgb]{1,0.4,0}{orange}).}
   \label{fig:auc-results}
 \end{figure}
 
@@ -203,11 +203,11 @@ As a result of our proposals the gated TabTransformer shows between 0.5\% and 1.
 
 A fruitful direction for further research would be to investigate the effects of combining our current solutions with some of the recent breakthroughs in regularization, feature engineering, etc.
 
-As a long term direction we will be working on a custom AutoML\footnote{\url{https://en.wikipedia.org/wiki/Automated_machine_learning}} pipeline focused on tabular data modeling. It will require the implementation of neural architecture search\footnote{\url{https://en.wikipedia.org/wiki/Neural_architecture_search}} strategies such as reinforcement learning or other evolutionary algorithms \cite{elsken2019neural} to test and discover new model designs. As a reference a paper titled "The Evolved Transformer" \cite{so2019evolved} by Google from 2019 should be mentioned. It describes how NAS can be used with a Transformer \cite{vaswani2017attention} as initial seed to discover more sophisticated architectures. Analogically TabNet, TabTransformer and other tabular models could be used as seeds in a potential NAS process. Additional embedding techniques and manipulated representations of the data (e.g. TaBERT \cite{yin2020tabert}, TabFormer \cite{padhi2021tabular}) can be incorporated as pre-processing steps.
+As a long term direction we will be working on a custom AutoML\footnote{\url{https://en.wikipedia.org/wiki/Automated_machine_learning}} pipeline focused on tabular data modeling. It will require the implementation of neural architecture search\footnote{\url{https://en.wikipedia.org/wiki/Neural_architecture_search}} strategies such as reinforcement learning or evolutionary algorithms \cite{elsken2019neural} to test and discover new model designs. As a reference a paper titled "The Evolved Transformer" \cite{so2019evolved} by Google from 2019 should be mentioned. It describes how NAS can be used with a Transformer \cite{vaswani2017attention} as initial seed to discover more sophisticated architectures. Analogically TabNet, TabTransformer and other tabular models could be used as seeds in a potential NAS process. Additional embedding techniques and manipulated representations of the data (e.g. TaBERT \cite{yin2020tabert}, TabFormer \cite{padhi2021tabular}) can be incorporated as pre-processing steps.
 
 \section{Conclusion}
 
-In the presented study we have explored some modifications to the original TabTransformer \cite{Huang2020TabTransformerTD} architecture which impact beneficially binary classification tasks for three separate datasets with up to 1.5\% area under receiver operating characteristic curve gains. Linear projections inspired by gated multilayer perceptrons \cite{Liu2021PayAT} have been proposed for the TabTransformer's final MLP block where its final logits are generated. We have also conducted multiple hyper parameter optimization iterations during training to test the impact of different activation functions, learning rates, hidden dimensions and layer structures. These findings have significant importance  ... and will be applied in practical AutoML 
+In the presented study we have explored some modifications to the original TabTransformer \cite{Huang2020TabTransformerTD} architecture which impact beneficially binary classification tasks for three separate datasets with more than 1\% area under receiver operating characteristic curve gains. Linear projections inspired by gated multilayer perceptrons \cite{Liu2021PayAT} have been proposed for the TabTransformer's final MLP block where its final logits are generated. We have also conducted multiple hyper parameter optimization iterations during training to test the impact of different activation functions, learning rates, hidden dimensions and layer structures. These findings have significant importance when working with tabular predictions and we've open-sourced our model and applied it in practical use cases to further showcase their importance.
 
 \section{Acknowledgements}
 
