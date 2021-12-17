@@ -2,14 +2,14 @@
 
 A deep learning tabular classification architecture inspired by [TabTransformer](https://arxiv.org/abs/2012.06678) with integrated [gated](https://arxiv.org/abs/2105.08050) multilayer perceptron.
 
-<img alt="Architecture" src="./paper/media/Gated_TabTransformer.png" width="350px"></img>
+<img alt="Architecture" src="./paper/media/GatedTabTransformer-architecture.png" width="350px"></img>
 
 ## Usage
 
 ```python
 model = TabTransformer(
-    categories = n_categories,                          # tuple containing the number of unique values within each category
-    num_continuous = train_cont.shape[1],               # number of continuous values
+    categories = config["categories"],                  # tuple containing the number of unique values within each category
+    num_continuous = config["num_continuous"],          # number of continuous values
     transformer_dim = config["transformer_dim"],        # dimension, paper set at 32
     dim_out = 1,                                        # binary prediction, but could be anything
     transformer_depth = config["transformer_depth"],    # depth, paper recommended 6
