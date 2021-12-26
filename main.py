@@ -101,7 +101,7 @@ if __name__ == "__main__":
             "gmlp_enabled": tune.grid_search([False, True]),
             "mlp_depth": tune.grid_search([2, 4, 6, 8]),
             "mlp_dimension": tune.grid_search([8, 16, 32, 64, 128, 256]),
-            "dropout": tune.grid.search([0.0, 0.1, 0.2, 0.5])
+            "dropout": tune.grid_search([0.0, 0.1, 0.2, 0.5])
         })
 
     print("Best config: ", analysis.get_best_config(metric="auc", mode="max"))
