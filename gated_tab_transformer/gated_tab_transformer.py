@@ -130,7 +130,7 @@ class MLP(nn.Module):
 
 # main class
 
-class TabTransformer(nn.Module):
+class GatedTabTransformer(nn.Module):
     def __init__(
         self,
         *,

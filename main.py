@@ -6,7 +6,7 @@ import pandas as pd
 import ray
 from ray import tune
 
-from gated_tab_transformer import TabTransformer
+from gated_tab_transformer import GatedTabTransformer
 from train_with_validation import train, validate
 from data_utils import get_unique_categorical_counts, get_categ_cont_target_values, train_val_test_split
 from metadata import datasets
@@ -32,7 +32,7 @@ val_cont, val_categ, val_target = get_categ_cont_target_values(val_dataframe, DA
 test_cont, test_categ, test_target = get_categ_cont_target_values(test_dataframe, DATA["POSITIVE_CLASS"], DATA["CONT_COUNT"])
 
 def train_experiment(config):
-    model = TabTransformer(
+    model = GatedTabTransformer(
         categories = n_categories,                          # tuple containing the number of unique values within each category
         num_continuous = train_cont.shape[1],               # number of continuous values
         transformer_dim = config["transformer_dim"],        # dimension, paper set at 32
@@ -78,6 +78,22 @@ def train_experiment(config):
     tune.report(auc=score)
     print("Final score", score)
 
+
+train_experiment({
+    "batch_size": 256,
+    "patience": 5,
+    "initial_lr": 1e-3,
+    "scheduler_gamma": 0.1,
+    "scheduler_step": 5,
+    "relu_slope": 0,
+    "transformer_heads": 8,
+    "transformer_depth": 6,
+    "transformer_dim": 8,
+    "gmlp_enabled": True,
+    "mlp_depth": 6,
+    "mlp_dimension": 64,
+    "dropout": 0.2,
+})
 
 # HPO training example summarizing all the aspects of the paper
 if __name__ == "__main__":
