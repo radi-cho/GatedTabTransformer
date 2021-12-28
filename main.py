@@ -6,30 +6,32 @@ import pandas as pd
 import ray
 from ray import tune
 
+import inquirer
 from gated_tab_transformer import GatedTabTransformer
 from train_with_validation import train, validate
 from data_utils import get_unique_categorical_counts, get_categ_cont_target_values, train_val_test_split
 from metadata import datasets
 
 device = torch.device("cuda")
-LOG_INTERVAL = 20
-MAX_EPOCHS= 200
-RANDOMIZE_SAMPLES=False
-DATA = datasets["BANK"]
+LOG_INTERVAL = 10
+MAX_EPOCHS = 200
+RANDOMIZE_SAMPLES = False
+DATASET = "BLASTCHAR"
 
-dataset = pd.read_csv(DATA["PATH"], header=0)
+data = datasets[DATASET]
+dataset = pd.read_csv(data["PATH"], header=0)
 
 if RANDOMIZE_SAMPLES:
     # Randomize order
     dataset = dataset.sample(frac=1)
 
-n_categories = get_unique_categorical_counts(dataset, DATA["CONT_COUNT"])
+n_categories = get_unique_categorical_counts(dataset, data["CONT_COUNT"])
 
 train_dataframe, val_dataframe, test_dataframe = train_val_test_split(dataset)
 
-train_cont, train_categ, train_target = get_categ_cont_target_values(train_dataframe, DATA["POSITIVE_CLASS"], DATA["CONT_COUNT"])
-val_cont, val_categ, val_target = get_categ_cont_target_values(val_dataframe, DATA["POSITIVE_CLASS"], DATA["CONT_COUNT"])
-test_cont, test_categ, test_target = get_categ_cont_target_values(test_dataframe, DATA["POSITIVE_CLASS"], DATA["CONT_COUNT"])
+train_cont, train_categ, train_target = get_categ_cont_target_values(train_dataframe, data["POSITIVE_CLASS"], data["CONT_COUNT"])
+val_cont, val_categ, val_target = get_categ_cont_target_values(val_dataframe, data["POSITIVE_CLASS"], data["CONT_COUNT"])
+test_cont, test_categ, test_target = get_categ_cont_target_values(test_dataframe, data["POSITIVE_CLASS"], data["CONT_COUNT"])
 
 def train_experiment(config):
     model = GatedTabTransformer(
@@ -79,45 +81,82 @@ def train_experiment(config):
     print("Final score", score)
 
 
-train_experiment({
-    "batch_size": 256,
-    "patience": 5,
-    "initial_lr": 1e-3,
-    "scheduler_gamma": 0.1,
-    "scheduler_step": 5,
-    "relu_slope": 0,
-    "transformer_heads": 8,
-    "transformer_depth": 6,
-    "transformer_dim": 8,
-    "gmlp_enabled": True,
-    "mlp_depth": 6,
-    "mlp_dimension": 64,
-    "dropout": 0.2,
-})
-
 # HPO training example summarizing all the aspects of the paper
 if __name__ == "__main__":
-    ray.init(address='auto')
+    print("Currently loaded dataset -", DATASET)
+   
+    questions = [
+        inquirer.List("experiment",
+            message="Please select an experiment",
+            choices=[
+                ("GatedTabTransformer POC with gMLP", "gated_poc"),
+                ("TabTransformer POC without gMLP", "regular_poc"),
+                # ("Ray HPO: Demo", "hpo_demo"),
+                ("Ray HPO: All paper parameters", "hpo_all"),
+            ],
+        ),
+    ]
 
-    analysis = tune.run(
-        train_experiment,
-        num_samples=15,
-        log_to_file=True,
-        resources_per_trial={"gpu": 1},
-        config={
-            "batch_size": tune.choice([128, 256]),
-            "patience": tune.choice([2, 5, 10, 15]),
-            "initial_lr": tune.grid_search([5e-2, 1e-2, 5e-3, 1e-3, 5e-4]),
-            "scheduler_gamma": tune.grid_search([0.5, 0.2, 0.1]),
-            "scheduler_step": tune.grid_search([5, 10, 15]),
-            "relu_slope": tune.grid_search([0.01, 0.02, 0.05, 0.1, 0.2]),
-            "transformer_heads": tune.grid_search([4, 8, 12, 16]),
-            "transformer_depth": tune.grid_search([4, 6, 8]),
-            "transformer_dim": tune.grid_search([8, 16, 32, 64, 128]),
-            "gmlp_enabled": tune.grid_search([False, True]),
-            "mlp_depth": tune.grid_search([2, 4, 6, 8]),
-            "mlp_dimension": tune.grid_search([8, 16, 32, 64, 128, 256]),
-            "dropout": tune.grid_search([0.0, 0.1, 0.2, 0.5])
+    answers = inquirer.prompt(questions)
+    print("Running experiment...")
+    
+    if answers["experiment"] == "hpo_all":
+        ray.init(address="auto")
+        analysis = tune.run(
+            train_experiment,
+            num_samples=15,
+            log_to_file=True,
+            resources_per_trial={"gpu": 1},
+            config={
+                "batch_size": tune.choice([128, 256]),
+                "patience": tune.choice([2, 5, 10, 15]),
+                "initial_lr": tune.grid_search([5e-2, 1e-2, 5e-3, 1e-3, 5e-4]),
+                "scheduler_gamma": tune.grid_search([0.5, 0.2, 0.1]),
+                "scheduler_step": tune.grid_search([5, 10, 15]),
+                "relu_slope": tune.grid_search([0.01, 0.02, 0.05, 0.1, 0.2]),
+                "transformer_heads": tune.grid_search([4, 8, 12, 16]),
+                "transformer_depth": tune.grid_search([4, 6, 8]),
+                "transformer_dim": tune.grid_search([8, 16, 32, 64, 128]),
+                "gmlp_enabled": tune.grid_search([False, True]),
+                "mlp_depth": tune.grid_search([2, 4, 6, 8]),
+                "mlp_dimension": tune.grid_search([8, 16, 32, 64, 128, 256]),
+                "dropout": tune.grid_search([0.0, 0.1, 0.2, 0.5])
+            }
+        )
+
+        print("Best config: ", analysis.get_best_config(metric="auc", mode="max"))
+
+    if answers["experiment"] == "gated_poc":
+        train_experiment({
+            "batch_size": 256,
+            "patience": 5,
+            "initial_lr": 1e-3,
+            "scheduler_gamma": 0.1,
+            "scheduler_step": 8,
+            "relu_slope": 0,
+            "transformer_heads": 8,
+            "transformer_depth": 6,
+            "transformer_dim": 8,
+            "gmlp_enabled": True,
+            "mlp_depth": 6,
+            "mlp_dimension": 64,
+            "dropout": 0.2,
         })
 
-    print("Best config: ", analysis.get_best_config(metric="auc", mode="max"))
+    if answers["experiment"] == "regular_poc":
+        train_experiment({
+            "batch_size": 256,
+            "patience": 5,
+            "initial_lr": 1e-3,
+            "scheduler_gamma": 0.1,
+            "scheduler_step": 8,
+            "relu_slope": 0,
+            "transformer_heads": 8,
+            "transformer_depth": 6,
+            "transformer_dim": 8,
+            "gmlp_enabled": False,
+            "mlp_depth": 6,
+            "mlp_dimension": 128,
+            "dropout": 0.2,
+        })
+
