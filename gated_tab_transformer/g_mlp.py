@@ -6,13 +6,9 @@ from torch import nn, einsum
 from einops import rearrange, repeat
 from einops.layers.torch import Rearrange, Reduce
 
-# functions
+from .utils import exists
+from .shared_classes import Residual, PreNorm
 
-def exists(val):
-    return val is not None
-
-def pair(val):
-    return (val, val) if not isinstance(val, tuple) else val
 
 def dropout_layers(layers, prob_survival):
     if prob_survival == 1:
@@ -29,20 +25,12 @@ def dropout_layers(layers, prob_survival):
     layers = [layer for (layer, drop) in zip(layers, to_drop) if not drop]
     return layers
 
+
 def shift(t, amount, mask = None):
     if amount == 0:
         return t
     return F.pad(t, (0, 0, amount, -amount), value = 0.)
 
-# helper classes
-
-class Residual(nn.Module):
-    def __init__(self, fn):
-        super().__init__()
-        self.fn = fn
-
-    def forward(self, x):
-        return self.fn(x) + x
 
 class PreShiftTokens(nn.Module):
     def __init__(self, shifts, fn):
@@ -63,15 +51,6 @@ class PreShiftTokens(nn.Module):
         x = torch.cat((*segments_to_shift, *rest), dim = -1)
         return self.fn(x, **kwargs)
 
-class PreNorm(nn.Module):
-    def __init__(self, dim, fn):
-        super().__init__()
-        self.fn = fn
-        self.norm = nn.LayerNorm(dim)
-
-    def forward(self, x, **kwargs):
-        x = self.norm(x)
-        return self.fn(x, **kwargs)
 
 class Attention(nn.Module):
     def __init__(self, dim_in, dim_out, dim_inner, causal = False):
@@ -94,6 +73,7 @@ class Attention(nn.Module):
         attn = sim.softmax(dim = -1)
         out = einsum('b i j, b j d -> b i d', attn, v)
         return self.to_out(out)
+
 
 class SpatialGatingUnit(nn.Module):
     def __init__(
@@ -170,6 +150,7 @@ class SpatialGatingUnit(nn.Module):
 
         return self.act(gate) * res
 
+
 class gMLPBlock(nn.Module):
     def __init__(
         self,
@@ -201,7 +182,6 @@ class gMLPBlock(nn.Module):
         x = self.proj_out(x)
         return x
 
-# main classes
 
 class gMLP(nn.Module):
     def __init__(
