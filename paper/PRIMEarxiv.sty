@@ -1,34 +1,21 @@
-% Template adapted from the NeurIPS template by Victor Kolev
-% Roman Garnett (garnett@wustl.edu) and the many authors of
-% nips15submit_e.sty, including MK and drstrip@sandia
+%based on the Arxiv style of George Kour (available at https://github.com/kourgeorge/arxiv-style)
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{style}[SRS style file]
 
-% change this every year 
-\newcommand{\@year}{22}
+\ProcessOptions\relax
 
-\newcommand{\@noticestring}{%
-Student Conference \@year
-}
-
-% load packages
-\RequirePackage[numbers]{natbib}
-\RequirePackage{graphicx}
-\RequirePackage{amsfonts}
-\RequirePackage{amsmath}
-\RequirePackage{amssymb}
-\RequirePackage{amsthm}
-\RequirePackage{url}
+% fonts
+\renewcommand{\rmdefault}{ptm}
+\renewcommand{\sfdefault}{phv}
 
 % set page geometry
 \usepackage[verbose=true,letterpaper]{geometry}
 \AtBeginDocument{
   \newgeometry{
     textheight=9in,
-    textwidth=5.5in,
+    textwidth=6.5in,
     top=1in,
-    headheight=12pt,
+    headheight=14pt,
     headsep=25pt,
     footskip=30pt
   }
@@ -38,6 +25,21 @@ Student Conference \@year
 \clubpenalty=10000
 \flushbottom
 \sloppy
+
+\usepackage{fancyhdr}
+\fancyhf{}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\fancyheadoffset{0pt}
+\rhead{ \textit{PRIME AI paper}} %\scshape A preprint - \today  \number\year
+\cfoot{\thepage}
+
+
+%Handling Keywords
+\def\keywordname{{\bfseries \emph Keywords}}%
+\def\keywords#1{\par\addvspace\medskipamount{\rightskip=0pt plus1cm
+\def\and{\ifhmode\unskip\nobreak\fi\ $\cdot$
+}\noindent\keywordname\enspace\ignorespaces#1\par}}
 
 % font sizes with reduced leading
 \renewcommand{\normalsize}{%
@@ -63,7 +65,6 @@ Student Conference \@year
 \renewcommand{\LARGE}{\@setfontsize\LARGE\@xviipt{20}}
 \renewcommand{\huge}{\@setfontsize\huge\@xxpt{23}}
 \renewcommand{\Huge}{\@setfontsize\Huge\@xxvpt{28}}
-\renewcommand*{\bibfont}{\@setfontsize\footnotesize\@xpt\@xpt}
 
 % sections with less space
 \providecommand{\section}{}
@@ -112,16 +113,16 @@ Student Conference \@year
 \renewcommand{\textfraction     }{0.1}
 \renewcommand{\floatpagefraction}{0.7}
 
-\newlength{\@srsabovecaptionskip}\setlength{\@srsabovecaptionskip}{7\p@}
-\newlength{\@srsbelowcaptionskip}\setlength{\@srsbelowcaptionskip}{\z@}
+\newlength{\@abovecaptionskip}\setlength{\@abovecaptionskip}{7\p@}
+\newlength{\@belowcaptionskip}\setlength{\@belowcaptionskip}{\z@}
 
-\setlength{\abovecaptionskip}{\@srsabovecaptionskip}
-\setlength{\belowcaptionskip}{\@srsbelowcaptionskip}
+\setlength{\abovecaptionskip}{\@abovecaptionskip}
+\setlength{\belowcaptionskip}{\@belowcaptionskip}
 
 % swap above/belowcaptionskip lengths for tables
 \renewenvironment{table}
-  {\setlength{\abovecaptionskip}{\@srsbelowcaptionskip}%
-   \setlength{\belowcaptionskip}{\@srsabovecaptionskip}%
+  {\setlength{\abovecaptionskip}{\@belowcaptionskip}%
+   \setlength{\belowcaptionskip}{\@abovecaptionskip}%
    \@float{table}}
   {\end@float}
 
@@ -187,6 +188,7 @@ Student Conference \@year
     \thispagestyle{empty}
     \@maketitle
     \@thanks
+    %\@notice
   \endgroup
   \let\maketitle\relax
   \let\thanks\relax
@@ -201,95 +203,55 @@ Student Conference \@year
 \newcommand{\@bottomtitlebar}{
   \vskip 0.29in
   \vskip -\parskip
-  \hrule height 1\p@
+  \hrule height 2\p@
   \vskip 0.09in%
 }
 
-% create title 
+% create title (includes both anonymized and non-anonymized versions)
 \providecommand{\@maketitle}{}
-\newcommand{\@shorttitle}{\@title}
-\newcommand{\@shortauthor}{\@author}
-\renewcommand{\title}[2][\@title]{\gdef\@title{#2}\renewcommand\@shorttitle{#1}}
-\renewcommand{\author}[2][\@author]{\gdef\@author{#2}\renewcommand{\@shortauthor}{#1}}
-\RequirePackage{fancyhdr}
-\pagestyle{fancy}
-\setlength{\headwidth}{5.5in}
-\lhead{\texttt{\@shorttitle}, \textit{\@shortauthor}}
-\rhead{Student Conference \@year}
-
-
-\newcommand{\mentor}[1]{\gdef\@mentor{#1}}
 \renewcommand{\@maketitle}{%
-    \includegraphics[width=\textwidth]{UchIMI-logo-Kalina-all.jpg}%
-    \vspace{1em}%
-    \begin{center}
-    \bfseries%
-    {\LARGE%
-        Student Conference \@year\\%
-        }\vspace{2em}%
-        % \@toptitlebar
-        \centering
-        {\huge\bf \@title\par}
-        \vspace{1em}%
-        % \@bottomtitlebar%
-        \def\And{%
-        \end{tabular}\hfil\linebreak[0]\hfil%
-        \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\ignorespaces%
-      }
-      \def\AND{%
-        \end{tabular}\hfil\linebreak[4]\hfil%
-        \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\ignorespaces%
-      }
-      {\large
-      \begin{center}
-          Author(s):
-      \end{center}
-      \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\@author\end{tabular}%
-      \vspace{1em}
-      \begin{center}
-          Scientific Advisor(s):\\
-      \end{center}
-      \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\@mentor\end{tabular}}%
-    \vskip 0.3in \@minus 0.1in
-    \end{center}
+  \vbox{%
+    \hsize\textwidth
+    \linewidth\hsize
+    \vskip 0.1in
+    \@toptitlebar
+    \centering
+    {\LARGE\sc \@title\par}
+    \@bottomtitlebar
+    % \textsc{ }\\ %A Preprint
+    \vskip 0.1in
+    \def\And{%
+      \end{tabular}\hfil\linebreak[0]\hfil%
+      \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\ignorespaces%
+    }
+    \def\AND{%
+      \end{tabular}\hfil\linebreak[4]\hfil%
+      \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\ignorespaces%
+    }
+    \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\@author\end{tabular}%
+  \vskip 0.4in \@minus 0.1in \center{ }   \vskip 0.2in %\today
+  }
 }
 
-% Citation styling 
-\RequirePackage{color}
-\RequirePackage{hyperref}
-\definecolor{mydarkblue}{rgb}{0,0.08,0.45}
-\hypersetup{%
-pdftitle={},
-pdfauthor={},
-pdfsubject={Student Conference}
-pdfkeywords={},
-pdfborder=0 0 0,
-pdfpagemode=UseNone,
-colorlinks=true,
-linkcolor=mydarkblue,
-citecolor=mydarkblue,
-filecolor=mydarkblue,
-urlcolor=mydarkblue,
-pdfview=FitH}
-
-
+% add conference notice to bottom of first page
+\newcommand{\ftype@noticebox}{8}
+\newcommand{\@notice}{%
+  % give a bit of extra room back to authors on first page
+  \enlargethispage{2\baselineskip}%
+  \@float{noticebox}[b]%
+    \footnotesize\@noticestring%
+  \end@float%
+}
 
 % abstract styling
-\renewenvironment{abstract}%
-{%
-  \vfill%
-  \vskip 0.05in%
-  \centerline%
-  {\large\bf Abstract}%
-  \vspace{0.5ex}%
-  \begin{quote}%
+\renewenvironment{abstract}
+{
+  \centerline
+  {\large \bfseries \scshape Abstract}
+  \begin{quote}
 }
 {
-  \par%
-  \end{quote}%
-  \vspace{4em}%
-  \vskip 1ex%
-  \newpage%
+  \end{quote}
 }
 
 \endinput

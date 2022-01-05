@@ -1,42 +1,64 @@
 \documentclass{article}
-\usepackage{style}
-\usepackage[utf8]{inputenc}
-\usepackage[T2A]{fontenc}
-\usepackage{lipsum}
-\usepackage{multicol}
-\usepackage{color,soul}
-\usepackage{booktabs}
-\usepackage[toc,page]{appendix}
 
-\graphicspath{{media/}}
+
+\usepackage{PRIMEarxiv}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{fancyhdr}       % header
+\usepackage{graphicx}       % graphics
+\usepackage{xcolor}
+\usepackage{mathtools}
+\usepackage[square,numbers]{natbib}
+\graphicspath{{media/}}     % organize your images and other figures under media/ folder
+
+%Header
+\pagestyle{fancy}
+\thispagestyle{empty}
+\rhead{ \textit{ The GatedTabTransformer. }} 
+
+% Update your Headers here
+\fancyhead[LO]{Radostin Cholakov and Todor Kolev}
 
 \newcommand{\projectSource}{\url{https://github.com/radi-cho/GatedTabTransformer}}
 
-\title[The GatedTabTransformer]{The GatedTabTransformer.\\
-An enhanced deep learning\\
-architecture for tabular modeling.}
-\author[R. Cholakov]{%
-Radostin Cholakov\\%
-High School of Mathematics\\%
-"Acad. Kiril Popov" - Plovdiv\\%
-\texttt{radicho123@gmail.com}%
+
+  
+%% Title
+\title{The GatedTabTransformer. An enhanced\\
+deep learning architecture for tabular modeling.}
+
+\author{
+  Radostin Cholakov \\
+  High School of Mathematics\\
+  Plovdiv, Bulgaria\\
+  \texttt{r.cholakov@obecto.com} \\
+  %% examples of more authors
+   \And
+  Todor Kolev \\
+  Obecto \\
+  Sofia, Bulgaria \\
+  \texttt{tkolev@obecto.com} \\
 }
 
-\mentor{Todor Kolev\\%
-Comrade Cooperative\\%
-Sofia, Bulgaria\\%
-\texttt{t.kolev@comrade.coop}%
-}
 
 \begin{document}
-
 \maketitle
+
+
 \begin{abstract}
     There is an increasing interest in the application of deep learning architectures to tabular data. One of the state-of-the-art solutions is TabTransformer which incorporates an attention mechanism to better track relationships between categorical features and then makes use of a standard MLP to output its final logits. In this paper we propose multiple modifications to the original TabTransformer performing better on binary classification tasks for three separate datasets with more than 1\% AUROC gains. Inspired by gated MLP, linear projections are implemented in the MLP block and multiple activation functions are tested. We also evaluate the importance of specific hyper parameters during training.
-
-    \medskip
-    Keywords: deep learning, Transformer, tabular data
 \end{abstract}
+
+\keywords{deep learning \and Transformer \and tabular data}
+
+
 
 \section{Introduction}
 
@@ -152,10 +174,10 @@ Yet another aspect of optimization is to choose an activation function for the m
 
 \begin{equation}
     LeakyReLU(x)= 
-    \begin{cases}
+    \begin{dcases}
         x,& \text{if } x\geq 0\\
         negative\_slope * x,              & \text{otherwise}
-    \end{cases}
+    \end{dcases}
 \end{equation}
 
 For both models LeakyReLU with slopes from 0.01 up to 0.05 and the standard ReLU performed with highest results. For simplicity and consistency we proceeded our work with standard ReLU activation. More about the effect of LeakyReLU can be found in the following study - \cite{fiedler2021simple}.
