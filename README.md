@@ -1,6 +1,6 @@
 # The GatedTabTransformer.
 
-A deep learning tabular classification architecture inspired by [TabTransformer](https://arxiv.org/abs/2012.06678) with integrated [gated](https://arxiv.org/abs/2105.08050) multilayer perceptron. Read paper on [arXiv](https://arxiv.org/abs/2201.00199).
+A deep learning tabular classification architecture inspired by [TabTransformer](https://arxiv.org/abs/2012.06678) with integrated [gated](https://arxiv.org/abs/2105.08050) multilayer perceptron. Check out our paper on [arXiv](https://arxiv.org/abs/2201.00199).
 
 <img alt="Architecture" src="./paper/media/GatedTabTransformer-architecture.png" width="350px"></img>
 
@@ -35,7 +35,7 @@ print(pred)
 
 ## Citation
 
-```
+```bibtex
 @misc{cholakov2022gatedtabtransformer,
       title={The GatedTabTransformer. An enhanced deep learning architecture for tabular modeling}, 
       author={Radostin Cholakov and Todor Kolev},
@@ -44,7 +44,8 @@ print(pred)
       archivePrefix={arXiv},
       primaryClass={cs.LG}
 }
-
+```
+```bibtex
 @software{GatedTabTransformer,
   author = {{Radostin Cholakov, Todor Kolev}},
   title = {The GatedTabTransformer.},
