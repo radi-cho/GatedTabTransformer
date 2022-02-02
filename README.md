@@ -1,6 +1,6 @@
 # The GatedTabTransformer.
 
-A deep learning tabular classification architecture inspired by [TabTransformer](https://arxiv.org/abs/2012.06678) with integrated [gated](https://arxiv.org/abs/2105.08050) multilayer perceptron. Check out our paper on [arXiv](https://arxiv.org/abs/2201.00199).
+A deep learning tabular classification architecture inspired by [TabTransformer](https://arxiv.org/abs/2012.06678) with integrated [gated](https://arxiv.org/abs/2105.08050) multilayer perceptron. Check out our paper on [arXiv](https://arxiv.org/abs/2201.00199). Applications and usage demonstrations are available [here](https://github.com/radi-cho/GatedTabTransformer-Applications).
 
 <img alt="Architecture" src="./paper/media/GatedTabTransformer-architecture.png" width="350px"></img>
 
