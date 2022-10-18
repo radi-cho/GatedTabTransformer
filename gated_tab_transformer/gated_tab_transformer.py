@@ -173,7 +173,7 @@ class GatedTabTransformer(nn.Module):
             self.mlp = gMLPClassification(
                 patch_width=1,
                 seq_len=input_size,
-                num_classes = 1,
+                num_classes = dim_out,
                 dim = mlp_dimension,
                 depth = mlp_depth
             )
