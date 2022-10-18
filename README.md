@@ -45,12 +45,3 @@ print(pred)
       primaryClass={cs.LG}
 }
 ```
-```bibtex
-@software{GatedTabTransformer,
-  author = {{Radostin Cholakov, Todor Kolev}},
-  title = {The GatedTabTransformer.},
-  url = {https://github.com/radi-cho/GatedTabTransformer},
-  version = {0.0.1},
-  date = {2021-12-15},
-}
-```
